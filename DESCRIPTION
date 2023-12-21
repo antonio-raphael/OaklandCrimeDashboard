@@ -21,8 +21,8 @@ Imports:
     shinycssloaders,
     shinythemes,
     shinyWidgets,
+    stats,
     stringr,
-    tidygeocoder,
     tidyr,
     tidyselect
 Encoding: UTF-8

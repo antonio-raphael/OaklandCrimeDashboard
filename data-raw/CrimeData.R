@@ -75,7 +75,26 @@ data <- data |>
   mutate(Offense_Category = dplyr::recode(Offense_Category,
                                           "Criminal traffic" = "Criminal Traffic"))
 
-CrimeData <- data
+data("Shapefile")
+
+Shapefile <- Shapefile |>
+  select(-c(ZCTA5CE20:Population)) |>
+  summarise(geometry = sf::st_union(geometry)) |>
+  mutate(Oakland = 1)
+
+CrimeData <- sf::st_as_sf(CrimeData,
+                          coords = c('Lon', 'Lat'),
+                          crs = sf::st_crs(Shapefile),
+                          remove = FALSE)
+
+CrimeData <- CrimeData |>
+  sf::st_join(Shapefile,
+              join = sf::st_intersects)
+
+CrimeData <- CrimeData |>
+  dplyr::filter(!is.na(Oakland)) |>
+  select(-c(Oakland)) |>
+  sf::st_drop_geometry()
 
 usethis::use_data(CrimeData, overwrite = TRUE)
 

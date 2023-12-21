@@ -1,0 +1,46 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-08-16"
+---
+
+```{r}
+library(tidyverse)
+library(sf)
+data("CrimeData")
+data("Shapefile")
+```
+
+```{r}
+    OutData <- sf::st_as_sf(CrimeData,
+                            coords = c('Lon', 'Lat'),
+                            crs = sf::st_crs(Shapefile))
+
+    test <- data.frame(OutData)
+    
+    test |> 
+      mutate(geometry = as.character(geometry)) -> temp
+
+    OutData2 <- OutData |>
+        dplyr::mutate(intersection = as.integer(sf::st_intersects(geometry, Shapefile)),
+                      ZipCode = dplyr::if_else(is.na(intersection),
+                                               '',
+                                               Shapefile$ZCTA5CE20[intersection])
+        ) 
+    
+    
+    OutData2 |> 
+              dplyr::mutate(Time_Frame = dplyr::case_when(dplyr::between(DATEFILTER,
+                                                                   max(OutData2$DATEFILTER, na.rm = TRUE)-30,
+                                                                   max(OutData2$DATEFILTER, na.rm = TRUE))    ~ "30 Days",
+                                                    dplyr::between(DATEFILTER,
+                                                                   max(OutData2$DATEFILTER, na.rm = TRUE)-60,
+                                                                   max(OutData2$DATEFILTER, na.rm = TRUE)-31) ~ "60 Days",
+                                                    dplyr::between(DATEFILTER,
+                                                                   max(OutData2$DATEFILTER, na.rm = TRUE)-90,
+                                                                   max(OutData2$DATEFILTER, na.rm = TRUE)-61) ~ "90 Days",
+                                        TRUE ~ "Wiggly_Pugs"
+          )) -> temp
+        # dplyr::filter((Time_Frame %in% Time_Filter) |>
+        #                   tidyr::replace_na(TRUE))
+```

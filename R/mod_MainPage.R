@@ -92,7 +92,7 @@ mod_MainPage_server <- function(id){
 
       }
 
-      print(FilterDate)
+      # print(FilterDate)
 
       # Max_Date <- max(CrimeData |>
       #                   dplyr::filter(DATEFILTER <= FilterDate),
@@ -205,7 +205,6 @@ mod_MainPage_server <- function(id){
                          as.character(input$MaxDate),
                          "<br>",
                          Count_Text)
-
 
 
       HTML(out_text)
@@ -430,6 +429,7 @@ mod_MainPage_server <- function(id){
                             fillOpacity  = 1,
                             weight       = 0,
                             popup        = popup
+
                             ) |>
         leaflet::addLegend(pal    = pal,
                            values = PlotData$Offense_Category)

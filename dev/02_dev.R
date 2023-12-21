@@ -23,6 +23,7 @@ usethis::use_pipe(export = TRUE)
 usethis::use_package("dplyr")
 usethis::use_package("tidyr")
 usethis::use_package("ggplot2")
+usethis::use_package("stats")
 usethis::use_package("stringr")
 usethis::use_package("DT")
 usethis::use_package("shinycssloaders")
@@ -35,8 +36,9 @@ usethis::use_package("shinycssloaders")
 usethis::use_package("tidyselect")
 usethis::use_package("forcats")
 usethis::use_package("leaflet")
-usethis::use_package("tidygeocoder")
 usethis::use_package("sf")
+
+
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -46,6 +48,7 @@ golem::add_module(name = "ZipCodeReporting", with_test = FALSE) # Name of the mo
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct("helpers", with_test = TRUE)
+golem::add_fct("CoordConvert")
 golem::add_utils("helpers", with_test = TRUE)
 
 ## External resources
