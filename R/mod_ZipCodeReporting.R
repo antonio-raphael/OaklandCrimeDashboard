@@ -21,10 +21,10 @@ mod_ZipCodeReporting_ui <- function(id){
                   label = "Select a Zip Code",
                   choices  = Shapefile |>
                     dplyr::select(ZCTA5CE20) |>
-                    dplyr::arrange(ZCTA5CE20) |>
+                    dplyr::arrange(dplyr::desc(ZCTA5CE20)) |>
                     dplyr::mutate(ZCTA5CE20 = as.character(ZCTA5CE20)) |>
-                    sf::st_drop_geometry()), # End Zipcode Select
-    width = 4), # End sidebarPanel
+                    sf::st_drop_geometry()) , # End Zipcode Select
+    width = 2), # End sidebarPanel
     mainPanel(
       fluidRow(uiOutput(ns("Title_Text"))),
       fluidRow(
@@ -32,13 +32,13 @@ mod_ZipCodeReporting_ui <- function(id){
         shinycssloaders::withSpinner(leaflet::leafletOutput(ns("CrimeMap"),
                                                             width = "100%"))), # End column
         column(6,
-               shinycssloaders::withSpinner(plotOutput(ns("BarGraph"),
-                                                       width = "100%"))), # End column
+               shinycssloaders::withSpinner(plotly::plotlyOutput(ns("BarGraph"),
+                                                                 width = "100%"))), # End column
       ),# End fluidRow
       fluidRow(
         shinycssloaders::withSpinner(echarts4r::echarts4rOutput(ns("TimeSeries_Plot")))
      ), # End fluidRow
-      width = 8
+      width = 10
     )# End mainPanel
   )
 }
@@ -158,7 +158,7 @@ mod_ZipCodeReporting_server <- function(id){
     })
 
 
-    output$BarGraph <- renderPlot({
+    output$BarGraph <- plotly::renderPlotly({
 
       OutData <- DATA_Reactive() |>
         sf::st_drop_geometry() |>
@@ -192,7 +192,7 @@ mod_ZipCodeReporting_server <- function(id){
         dplyr::mutate(Offense_Category = factor(Offense_Category,
                                                 levels = Levels))
 
-      OutData |>
+      OutPlot <- OutData |>
         ggplot2::ggplot(mapping = ggplot2::aes(x = Offense_Category,
                                                y = Count,
                                                fill = FIREARM)) +
@@ -202,7 +202,7 @@ mod_ZipCodeReporting_server <- function(id){
         ggplot2::coord_flip() +
         ggplot2::labs(title = "Distribution of Offenses by Category",
                       y     = "Frequency",
-                      x     = "Offense Category") +
+                      x     = NULL) +
         ggplot2::theme(plot.title   = ggplot2::element_text(hjust    = 0)        ,
                        axis.line    = ggplot2::element_line(size     = .2)       ,
                        panel.grid   = ggplot2::element_line(linetype = 2,
@@ -212,8 +212,26 @@ mod_ZipCodeReporting_server <- function(id){
                                                             hjust    = 0)        ,
                        axis.text.x  = ggplot2::element_text(vjust    = 1,
                                                             hjust    = 1)        ,
-                       legend.title = ggplot2::element_blank(),
-                       legend.position = "bottom")
+                       legend.title = ggplot2::element_blank())
+
+      plotly::ggplotly(OutPlot,
+                       tooltip = c("text", "y")) |>
+        plotly::layout(margin = list(l=0,
+                                     r=0,
+                                     b=10,
+                                     t=90,
+                                     pad=30)) %>%
+        plotly::layout(legend = list(orientation = "h",   # show entries horizontally
+                                     xanchor = "center",  # use center of legend as anchor
+                                     x = 1,
+                                     y = .15,
+                                     title=list(text='')))
+        # plotly::layout(title = list(text = paste0(title,
+        #                                           '<br>',
+        #                                           '<sup>',
+        #                                           subtitle,
+        #                                           '</sup>'),
+        #                             font=list(size = 20)))
 
 
     })

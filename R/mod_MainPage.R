@@ -410,8 +410,15 @@ mod_MainPage_server <- function(id){
                                     "#EC88B8",
                                     "#FF9A5C",
                                     "#FFC800",
-                                    "#FFC565"),
-                                  domain = NULL,
+                                    "#F98C18",
+                                    "#DF330E"),
+                                  domain = c("Criminal Traffic",
+                                             "Drug"            ,
+                                             "DUI Offense"     ,
+                                             "Other"           ,
+                                             "Property"        ,
+                                             "Public Order"    ,
+                                             "Violent")        ,
                                     na.color = "#808080")
 
       popup <- paste0("Crime Description: ",
@@ -445,12 +452,13 @@ mod_MainPage_server <- function(id){
         TIMESERIES_Reactive() |>
         dplyr::mutate(DATEFILTER = factor(DATEFILTER)) |>
         echarts4r::e_charts(DATEFILTER) |>
-        echarts4r::e_line(`Criminal Traffic`, smooth = TRUE) |>
-        echarts4r::e_line(`Drug`            , smooth = TRUE) |>
-        echarts4r::e_line(`DUI Offense`     , smooth = TRUE) |>
-        echarts4r::e_line(`Property`        , smooth = TRUE) |>
-        echarts4r::e_line(`Public Order`    , smooth = TRUE) |>
-        echarts4r::e_line(`Violent`         , smooth = TRUE) |>
+        echarts4r::e_line(`Criminal Traffic`, smooth = TRUE, color = "#6B95FF") |>
+        echarts4r::e_line(`Drug`            , smooth = TRUE, color = "#AC9BF8") |>
+        echarts4r::e_line(`DUI Offense`     , smooth = TRUE, color = "#EC88B8") |>
+        echarts4r::e_line(`Other`           , smooth = TRUE, color = "#FF9A5C") |>
+        echarts4r::e_line(`Property`        , smooth = TRUE, color = "#FFC800") |>
+        echarts4r::e_line(`Public Order`    , smooth = TRUE, color = "#F98C18") |>
+        echarts4r::e_line(`Violent`         , smooth = TRUE, color = "#DF330E") |>
         echarts4r::e_axis_labels(x = "Date",
                                  y = "Frequency") |> # axis labels
         echarts4r::e_title("Crimes per Day by Type") |>  # move legend to the bottom
@@ -464,10 +472,20 @@ mod_MainPage_server <- function(id){
                              #                }
                              #    ")
         ) |>
-        echarts4r::e_legend(right = 1)
+        echarts4r::e_legend(left = 1,
+                            bottom = 1)
 
       }else{
 
+
+        Ind_Color <- switch(input$CrimeCategory,
+                            "Criminal Traffic" = {"#6B95FF"},
+                            "Drug"             = {"#AC9BF8"},
+                            "DUI Offense"      = {"#EC88B8"},
+                            "Other"            = {"#FF9A5C"},
+                            "Property"         = {"#FFC800"},
+                            "Public Order"     = {"#F98C18"},
+                            "Violent"          = {"#DF330E"})
 
         TIMESERIES_Reactive() |>
           dplyr::mutate(DATEFILTER = factor(DATEFILTER)) |>
@@ -486,7 +504,9 @@ mod_MainPage_server <- function(id){
                                #                }
                                #    ")
           ) |>
-          echarts4r::e_legend(right = 0)
+          echarts4r::e_color(color = Ind_Color) |>
+          echarts4r::e_legend(left = 1,
+                              bottom = 1)
 
 
       }
